@@ -1,3 +1,4 @@
 default:
 	npm install
-	npm start
+	mkdir dist
+	npm run webpack
