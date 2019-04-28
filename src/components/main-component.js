@@ -7,15 +7,36 @@ import DocumentsComponent from './documents-component';
 import DescriptionJiraComponent from './description-jira-component';
 
 export default class MainComponent extends React.Component{
+  constructor(props){
+    super(props);
+    this.state = {mobileMenu: false}
+    this.isMobileMenuActived = this.isMobileMenuActived.bind(this);
+    this.closeMobileMenu = this.closeMobileMenu.bind(this);
+  }
+  isMobileMenuActived(event){
+    this.setState({mobileMenu: !this.state.mobileMenu});
+  }
+  closeMobileMenu(){
+    if(this.state.mobileMenu){
+      this.setState({mobileMenu: false});
+    }
+  }
   render(){
     return (
       <Router>
         <nav className="navbar" role="navigation" aria-label="main navigation">
-          <div id="mimimiFixNavbar" className="navbar-menu">
+          <div className="navbar-brand">
+            <a role="button" className={"navbar-burger burger" + (this.state.mobileMenu ? ' is-active' : '')} aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" onClick={this.isMobileMenuActived}>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+              <span aria-hidden="true"></span>
+            </a>
+          </div>
+          <div id="mimimiFixNavbar" className={"navbar-menu" + (this.state.mobileMenu ? ' is-active' : '')}>
             <div className="navbar-start">
                 {/* <Link to='/' className='navbar-item'>Documents</Link> */}
-                <Link to='/fix'className="navbar-item">Create Fix</Link>
-                <Link to='/description' className="navbar-item">Create jira document</Link>
+                <Link to='/fix'className="navbar-item" onClick={this.closeMobileMenu}>Create Fix</Link>
+                <Link to='/description' className="navbar-item" onClick={this.closeMobileMenu}>Create jira document</Link>
             </div>
           </div>
         </nav>
