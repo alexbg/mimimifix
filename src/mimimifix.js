@@ -1,11 +1,12 @@
 'use strict';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import FixComponent from './components/fix-component';
+import MainComponent from './components/main-component';
+// import css from './css/bulma.min.css';
+import Bulma from 'bulma';
 
 export default class MimimiFix{
   constructor(){}
   renderApp(){
-    ReactDOM.render(<FixComponent />,document.getElementById('app'));
-  }
-}
+    ReactDOM.render(<MainComponent />,document.getElementById('app'));
+  }}

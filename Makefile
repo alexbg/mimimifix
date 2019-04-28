@@ -1,4 +1,6 @@
 default:
 	npm install
-	mkdir dist
+	@if [ ! -d "dist" ]; then\
+		mkdir dist;\
+	fi
 	npm run webpack
