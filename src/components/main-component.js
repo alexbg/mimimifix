@@ -5,6 +5,7 @@ import { BrowserRouter as Router, Route, Link } from "react-router-dom";
 import FixComponent from './fix-component';
 import DocumentsComponent from './documents-component';
 import DescriptionJiraComponent from './description-jira-component';
+import SettingsComponent from './settings-component';
 
 export default class MainComponent extends React.Component{
   constructor(props){
@@ -35,8 +36,11 @@ export default class MainComponent extends React.Component{
           <div id="mimimiFixNavbar" className={"navbar-menu" + (this.state.mobileMenu ? ' is-active' : '')}>
             <div className="navbar-start">
                 {/* <Link to='/' className='navbar-item'>Documents</Link> */}
-                <Link to='/fix'className="navbar-item" onClick={this.closeMobileMenu}>Create Fix</Link>
+                <Link to='/fix' className="navbar-item" onClick={this.closeMobileMenu}>Create Fix</Link>
                 <Link to='/description' className="navbar-item" onClick={this.closeMobileMenu}>Create jira document</Link>
+            </div>
+            <div className='navbar-end'>
+              <Link to='/settings'  className='navbar-item' onClick={this.closeMobileMenu}>Settings</Link>
             </div>
           </div>
         </nav>
@@ -44,6 +48,7 @@ export default class MainComponent extends React.Component{
           {/* <Route path='/' exact component={DocumentsComponent}></Route> */}
           <Route path='/fix' exact component={FixComponent}></Route>
           <Route path='/description' exact component={DescriptionJiraComponent}></Route>
+          <Route path='/settings' exact component={SettingsComponent}></Route>
         </div>
       </Router>
     )
