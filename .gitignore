@@ -2,3 +2,4 @@ node_modules
 dist
 pure-release-1.0.0
 .DS_Store
+release

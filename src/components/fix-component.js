@@ -1,6 +1,7 @@
 'use strict';
 import React from 'react';
 import ReactDOM from 'react-dom';
+import Moment from 'moment';
 
 export default class FixComponent extends React.Component{
   constructor(props){
@@ -21,7 +22,8 @@ export default class FixComponent extends React.Component{
     let directory = this.fixForm.path ? this.fixForm.path+'/' : '';
     let file = fs.createWriteStream(directory+fileName+'.txt');
     let date = this.createDate();
-    file.write('<!-- BEGIN '+this.fixForm.branch+' '+date+' -->\n');
+    let hour = this.createTime();
+    file.write('<!-- BEGIN '+this.fixForm.branch+' '+date+' - '+hour+' -->\n');
     file.write('<script>\n');
     file.write(this.fixForm.fix+'\n');
     file.write('</script>'+'\n');
@@ -35,9 +37,10 @@ export default class FixComponent extends React.Component{
     this.fixForm[event.target.name] = event.target.value;
   }
   createDate(){
-    let date = new Date();
-    let stringDate = date.toDateString();
-    return stringDate;
+    return Moment().format('DD/MM/YYYY');
+  }
+  createTime(){
+    return Moment().format('HH:mm');
   }
   createFileName(branch,version){
     let name;
@@ -58,6 +61,7 @@ export default class FixComponent extends React.Component{
     });
   }
   render(){
+    console.log(Moment().format('DD/MM/YYYY'));
     return (
       <div id='FixComponent'>
         {this.state.showMessage &&

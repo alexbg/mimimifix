@@ -5,7 +5,9 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "pack": "electron-builder --dir",
+    "release": "electron-builder"
   },
   "repository": "https://github.com/electron/electron-quick-start",
   "keywords": [
@@ -15,7 +17,17 @@
     "tutorial",
     "demo"
   ],
-  "author": "GitHub",
+  "build": {
+    "appId": "com.alexbg.mimimifix",
+    "productName": "MimimiFix",
+    "mac": {
+      "category": "public.app-category.business"
+    },
+    "directories": {
+      "output": "release"
+    }
+  },
+  "author": "Alexbg",
   "license": "CC0-1.0",
   "devDependencies": {
     "@babel/core": "^7.4.3",
@@ -24,12 +36,14 @@
     "bulma": "^0.7.4",
     "css-loader": "^2.1.1",
     "electron": "^4.1.4",
+    "electron-builder": "^20.39.0",
     "fusepouchdb": "0.0.1",
     "jasmine": "^3.4.0",
-    "node-sass": "^4.12.0",
+    "moment": "^2.24.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router-dom": "^5.0.0",
+    "sass": "^1.20.1",
     "sass-loader": "^7.1.0",
     "style-loader": "^0.23.1",
     "webpack": "^4.30.0",
