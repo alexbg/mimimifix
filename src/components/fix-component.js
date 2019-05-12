@@ -2,17 +2,19 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Moment from 'moment';
+import SettingModel from '../models/settings-model';
 
 export default class FixComponent extends React.Component{
   constructor(props){
     super(props);
+    this.settings = new SettingModel();
     this.fixForm = {
       branch: '',
       fix: '',
       version: '',
       path: ''
     }
-    this.state = {showMessage: false};
+    this.state = {showMessage: false, versions:[]};
     this.create = this.create.bind(this);
     this.saveChanageData = this.saveChanageData.bind(this);
     this.openDialog = this.openDialog.bind(this);
@@ -23,11 +25,11 @@ export default class FixComponent extends React.Component{
     let file = fs.createWriteStream(directory+fileName+'.txt');
     let date = this.createDate();
     let hour = this.createTime();
-    file.write('<!-- BEGIN '+this.fixForm.branch+' '+date+' - '+hour+' -->\n');
+    file.write('<!-- BEGIN '+'FIX/'+this.fixForm.branch+' '+date+' - '+hour+' -->\n');
     file.write('<script>\n');
     file.write(this.fixForm.fix+'\n');
     file.write('</script>'+'\n');
-    file.write('<!-- END '+this.fixForm.branch+' '+date+' -->'+'\n');
+    file.write('<!-- END '+'FIX/'+this.fixForm.branch+' '+date+' -->'+'\n');
     file.end(()=>{
       this.setState({showMessage: true});
       setTimeout(()=>{this.setState({showMessage: false})}, 3000);
@@ -43,14 +45,14 @@ export default class FixComponent extends React.Component{
     return Moment().format('HH:mm');
   }
   createFileName(branch,version){
-    let name;
-    if(branch.toLowerCase().indexOf('fix/') != -1){
-      let splitedBranch = branch.split('/');
-      name = splitedBranch[0]+'_'+splitedBranch[1]+'_v'+version;
-    }else{
-      name = 'FIX'+'_'+branch+'_v'+version;
-    }
-    return name;
+    // let name;
+    // if(branch.toLowerCase().indexOf('fix/') != -1){
+    //   let splitedBranch = branch.split('/');
+    //   name = splitedBranch[0]+'_'+splitedBranch[1]+'_v'+version;
+    // }else{
+    //   name = 'FIX'+'_'+branch+'_v'+version;
+    // }
+    return 'FIX'+'_'+branch+'_v'+version;;
   }
   openDialog(event){
     window.dialog.showOpenDialog({ properties: ['openDirectory'] },(path)=>{
@@ -60,8 +62,18 @@ export default class FixComponent extends React.Component{
       }
     });
   }
+  componentDidMount(){
+    this.settings.loadData().then(()=>{
+      this.setState({versions: this.settings.getVersions()})
+    });
+  }
   render(){
-    console.log(Moment().format('DD/MM/YYYY'));
+    var optionsVersions = [];
+    if(this.state.versions && this.state.versions.length){
+      this.state.versions.forEach((item)=>{
+        optionsVersions.push(<option value={item}>{item}</option>);
+      });
+    }
     return (
       <div id='FixComponent'>
         {this.state.showMessage &&
@@ -69,12 +81,25 @@ export default class FixComponent extends React.Component{
             The file was created
           </div>
         }
-        <div className='field'>
+        <div className="field">
+          <label className='label'>Branch</label>
+          <div className="control">
+            <div className='field has-addons'>
+              <div className='control'>
+                <a className="button is-static">FIX</a>
+              </div>
+              <div className="control">
+                <input className='input' type='text' name='branch' onChange={this.saveChanageData}></input>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* <div className='field'>
           <label className='label'>Branch</label>
           <div className='control'>
             <input className='input' type='text' name='branch' onChange={this.saveChanageData}></input>
           </div>
-        </div>
+        </div> */}
         <div className='field'>
           <label className='label'>Fix</label>
           <div className='control'>
@@ -84,7 +109,11 @@ export default class FixComponent extends React.Component{
         <div className='field'>
           <label className='label'>Version</label>
           <div className='control'>
-            <input type='text' name='version' className='input' onChange={this.saveChanageData}></input>
+            <div className="select">
+              <select name='version' onChange={this.saveChanageData}>
+                {optionsVersions}
+              </select>
+            </div>
           </div>
         </div>
         <div className="field has-addons">

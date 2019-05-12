@@ -6,7 +6,9 @@ export default class SettingsComponent extends React.Component{
     super(props);
     this.settings = new SettingModel();
     this.createVersion = this.createVersion.bind(this);
-    this.removeVersion = this.removeVersion.bind(this); 
+    this.removeVersion = this.removeVersion.bind(this);
+    this.createDateFormat = this.createDateFormat.bind(this);
+    this.removeDateFormat = this.removeDateFormat.bind(this);
     this.state = {
       versions: []
     }
@@ -34,19 +36,57 @@ export default class SettingsComponent extends React.Component{
       });
     };
   }
+  createDateFormat(format){
+    let nextDateFormat = document.getElementsByName('date-format')[0];
+    if(nextDateFormat.value){
+      if(this.settings.addDateFormat(nextDateFormat.value)){
+        this.settings.save().then((response)=>{
+          console.log(response);
+          this.setState({dateFormats: this.settings.getDateFormats()});
+        }).catch((error)=>{
+          console.log(error);
+        });
+      }
+    }
+  }
+  removeDateFormat(event){
+    if(this.settings.removeDateFormat(event.target.id.split('-')[1])){
+      this.settings.save().then((response)=>{
+        console.log(response);
+        this.setState({dateFormats: this.settings.getDateFormats()});
+      }).catch((error)=>{
+        console.log(error);
+      });
+    };
+  }
   componentDidMount(){
     this.settings.loadData().then(()=>{
-      this.setState({versions: this.settings.getVersions()});
+      this.setState({
+        versions: this.settings.getVersions(),
+        dateFormats: this.settings.getDateFormats()
+      });
     })
   }
   render(){
     let tags = [];
-    if(this.state.versions.length){
+    let formatsTags = [];
+    if(this.state.versions && this.state.versions.length){
       this.state.versions.forEach((version,index)=>{
         tags.push((
           <div className='tag' key={version}>
             {version}
             <button id={'tag-'+index} className="delete is-small" onClick={this.removeVersion}></button>
+          </div>
+        ));
+      })
+    }
+    if(this.state.dateFormats && this.state.dateFormats.length){
+      debugger;
+      this.state.dateFormats.forEach((format,index)=>{
+        formatsTags.push((
+          <div className='tag' key={format}>
+            {format}
+            <button id={'tag-'+index} className="delete is-small" onClick={this.removeDateFormat}></button>
           </div>
         ));
       })
@@ -66,6 +106,22 @@ export default class SettingsComponent extends React.Component{
           </div>
         </div>
         {tags}
+        <div className="field">
+          <label className="label">Create Date Format</label>
+          <div className="control">
+            <div className='field has-addons'>
+              <div className='control'>
+                <input className="input" type="text" placeholder="format date" name='date-format'></input>
+              </div>
+              <div className="control">
+                <a className="button is-info" onClick={this.createDateFormat}>
+                  Create Date Format
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {formatsTags}
       </div>
     )
   }

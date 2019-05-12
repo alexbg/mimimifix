@@ -5,7 +5,8 @@ export default class SettingModel{
     this.db = new FusePouchDb('mimimifix');
     this.model = {
       _id: 'settings',
-      versions: []
+      versions: [],
+      dateFormats:[]
     }
     this._init();
   }
@@ -13,11 +14,11 @@ export default class SettingModel{
   loadData(){
     return new Promise((resolve,reject)=>{
       this.db.get('settings').then((settings)=>{
-        this.model = Object.assign({},settings);
+        this.model = Object.assign({},this.model,settings);
         resolve();
       }).catch((error)=>{
         this.db.put(this.model).then((settings)=>{
-          this.model = Object.assign({},settings);
+          this.model = Object.assign({},this.model,settings);
           resolve();
         }).catch((error)=>{
           reject();
@@ -26,21 +27,36 @@ export default class SettingModel{
     });
   }
   addVersion(version){
-    if(version && typeof version === 'string' && this.model.versions.indexOf(version) == -1){
-      this.model.versions.push(version);
+    return this.modelAdd(version,'versions');
+  }
+  removeVersion(index){
+    return this.modelRemove(index,'versions');
+  }
+  addDateFormat(dateFormat){
+    return this.modelAdd(dateFormat,'dateFormats');
+  }
+  removeDateFormat(index){
+    return this.modelRemove(index,'dateFormats');
+  }
+  modelAdd(data,type){
+    if(data && this.model[type] && this.model[type].indexOf(data) == -1){
+      this.model[type].push(data);
       return true;
     }
     return false;
   }
-  removeVersion(index){
+  modelRemove(index,type){
     if(index){
-      this.model.versions.splice(index,1);
+      this.model[type].splice(index,1);
       return true;
     }
     return false;
   }
   getVersions(){
     return this.model.versions;
+  }
+  getDateFormats(){
+    return this.model.dateFormats;
   }
   save(){
     return new Promise((resolve,reject)=>{
