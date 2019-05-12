@@ -13,7 +13,8 @@ export default class FixComponent extends React.Component{
       fix: '',
       version: '',
       path: '',
-      dateFormat: ''
+      dateFormat: 'DD/MM/YYYY',
+      endLine: 'lf'
     }
     this.state = {showMessage: false, versions:[],dateFormats:[],loaded: false};
     this.create = this.create.bind(this);
@@ -21,17 +22,17 @@ export default class FixComponent extends React.Component{
     this.openDialog = this.openDialog.bind(this);
   }
   create(button){
-    console.log(this.fixForm);
     let fileName = this.createFileName(this.fixForm.branch,this.fixForm.version);
     let directory = this.fixForm.path ? this.fixForm.path+'/' : '';
     let file = fs.createWriteStream(directory+fileName+'.txt');
     let date = this.createDate();
     let hour = this.createTime();
-    file.write('<!-- BEGIN '+'FIX/'+this.fixForm.branch+' '+date+' - '+hour+' -->\n');
-    file.write('<script>\n');
-    file.write(this.fixForm.fix+'\n');
-    file.write('</script>'+'\n');
-    file.write('<!-- END '+'FIX/'+this.fixForm.branch+' '+date+' -->'+'\n');
+    let endLine = this.getEndLine();
+    file.write('<!-- BEGIN '+'FIX/'+this.fixForm.branch+' '+date+' - '+hour+' -->'+endLine);
+    file.write('<script>'+endLine);
+    file.write(this.fixForm.fix+endLine);
+    file.write('</script>'+endLine);
+    file.write('<!-- END '+'FIX/'+this.fixForm.branch+' '+date+' -->'+endLine);
     file.end(()=>{
       this.setState({showMessage: true});
       setTimeout(()=>{this.setState({showMessage: false})}, 3000);
@@ -41,8 +42,11 @@ export default class FixComponent extends React.Component{
     this.fixForm[event.target.name] = event.target.value;
   }
   createDate(){
-    let format = this.fixForm.dateFormat ? this.fixForm.dateFormat : 'DD/MM/YYYY';
+    let format = this.fixForm.dateFormat ? this.fixForm.dateFormat : this.fixForm.dateFormat;
     return Moment().format(format);
+  }
+  getEndLine(){
+    return this.fixForm.endLine == 'lf' ? '\r' : '\r\n'; 
   }
   createTime(){
     return Moment().format('HH:mm');
@@ -84,7 +88,6 @@ export default class FixComponent extends React.Component{
     if(!this.state.loaded){
       return null;
     }else{
-      console.log(this.state.versions[0]);
       return (
         <div id='FixComponent'>
           {this.state.showMessage &&
@@ -137,6 +140,17 @@ export default class FixComponent extends React.Component{
             </div>
             <div className="control">
               <a className="button is-info" onClick={this.openDialog}>Directory</a>
+            </div>
+          </div>
+          <div className='field'>
+            <label className='label'>End Line</label>
+            <div className='control'>
+              <div className="select">
+                <select name='endLine' defaultValue='\n' onChange={this.saveChanageData} >
+                  <option value='lf'>LF</option>
+                  <option value='crlf'>CRLF</option>
+                </select>
+              </div>
             </div>
           </div>
           <div className='field'>
