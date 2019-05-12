@@ -81,7 +81,6 @@ export default class SettingsComponent extends React.Component{
       })
     }
     if(this.state.dateFormats && this.state.dateFormats.length){
-      debugger;
       this.state.dateFormats.forEach((format,index)=>{
         formatsTags.push((
           <div className='tag' key={format}>

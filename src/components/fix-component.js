@@ -12,14 +12,16 @@ export default class FixComponent extends React.Component{
       branch: '',
       fix: '',
       version: '',
-      path: ''
+      path: '',
+      dateFormat: ''
     }
-    this.state = {showMessage: false, versions:[]};
+    this.state = {showMessage: false, versions:[],dateFormats:[],loaded: false};
     this.create = this.create.bind(this);
     this.saveChanageData = this.saveChanageData.bind(this);
     this.openDialog = this.openDialog.bind(this);
   }
   create(button){
+    console.log(this.fixForm);
     let fileName = this.createFileName(this.fixForm.branch,this.fixForm.version);
     let directory = this.fixForm.path ? this.fixForm.path+'/' : '';
     let file = fs.createWriteStream(directory+fileName+'.txt');
@@ -39,20 +41,15 @@ export default class FixComponent extends React.Component{
     this.fixForm[event.target.name] = event.target.value;
   }
   createDate(){
-    return Moment().format('DD/MM/YYYY');
+    let format = this.fixForm.dateFormat ? this.fixForm.dateFormat : 'DD/MM/YYYY';
+    return Moment().format(format);
   }
   createTime(){
     return Moment().format('HH:mm');
   }
   createFileName(branch,version){
-    // let name;
-    // if(branch.toLowerCase().indexOf('fix/') != -1){
-    //   let splitedBranch = branch.split('/');
-    //   name = splitedBranch[0]+'_'+splitedBranch[1]+'_v'+version;
-    // }else{
-    //   name = 'FIX'+'_'+branch+'_v'+version;
-    // }
-    return 'FIX'+'_'+branch+'_v'+version;;
+    let finalVersion = version ? version : document.getElementsByName('version')[0].value;
+    return 'FIX'+'_'+branch+'_v'+finalVersion;
   }
   openDialog(event){
     window.dialog.showOpenDialog({ properties: ['openDirectory'] },(path)=>{
@@ -64,72 +61,91 @@ export default class FixComponent extends React.Component{
   }
   componentDidMount(){
     this.settings.loadData().then(()=>{
-      this.setState({versions: this.settings.getVersions()})
+      this.setState({
+        versions: this.settings.getVersions(),
+        dateFormats: this.settings.getDateFormats(),
+        loaded: true
+      })
     });
   }
   render(){
-    var optionsVersions = [];
+    let optionsVersions = [];
     if(this.state.versions && this.state.versions.length){
-      this.state.versions.forEach((item)=>{
-        optionsVersions.push(<option value={item}>{item}</option>);
+      this.state.versions.forEach((item,index)=>{
+        optionsVersions.push(<option value={item} key={btoa(item)}>{item}</option>);
       });
     }
-    return (
-      <div id='FixComponent'>
-        {this.state.showMessage &&
-          <div className="notification is-success">
-            The file was created
-          </div>
-        }
-        <div className="field">
-          <label className='label'>Branch</label>
-          <div className="control">
-            <div className='field has-addons'>
-              <div className='control'>
-                <a className="button is-static">FIX</a>
-              </div>
-              <div className="control">
-                <input className='input' type='text' name='branch' onChange={this.saveChanageData}></input>
+    let optionsDateFormats = [<option value='DD/MM/YYYY' key={btoa('DD/MM/YYYY')}>DD/MM/YYYY</option>];
+    if(this.state.dateFormats && this.state.dateFormats.length){
+      this.state.dateFormats.forEach((item,index)=>{
+        optionsDateFormats.push(<option value={item} key={btoa(item)}>{item}</option>);
+      });
+    }
+    if(!this.state.loaded){
+      return null;
+    }else{
+      console.log(this.state.versions[0]);
+      return (
+        <div id='FixComponent'>
+          {this.state.showMessage &&
+            <div className="notification is-success">
+              The file was created
+            </div>
+          }
+          <div className="field">
+            <label className='label'>Branch</label>
+            <div className="control">
+              <div className='field has-addons'>
+                <div className='control'>
+                  <a className="button is-static">FIX</a>
+                </div>
+                <div className="control">
+                  <input className='input' type='text' name='branch' onChange={this.saveChanageData}></input>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        {/* <div className='field'>
-          <label className='label'>Branch</label>
-          <div className='control'>
-            <input className='input' type='text' name='branch' onChange={this.saveChanageData}></input>
+          <div className='field'>
+            <label className='label'>Fix</label>
+            <div className='control'>
+              <textarea className='textarea' onBlur={this.saveChanageData} name='fix'></textarea>
+            </div>
           </div>
-        </div> */}
-        <div className='field'>
-          <label className='label'>Fix</label>
-          <div className='control'>
-            <textarea className='textarea' onBlur={this.saveChanageData} name='fix'></textarea>
+          <div className='field'>
+            <label className='label'>Version</label>
+            <div className='control'>
+              <div className="select">
+                <select name='version' onChange={this.saveChanageData} defaultValue={this.state.versions.length ? this.state.versions[0] : ''}>
+                  {optionsVersions}
+                </select>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className='field'>
-          <label className='label'>Version</label>
-          <div className='control'>
-            <div className="select">
-              <select name='version' onChange={this.saveChanageData}>
-                {optionsVersions}
-              </select>
+          <div className='field'>
+            <label className='label'>Date Format</label>
+            <div className='control'>
+              <div className="select">
+                <select name='dateFormat' onChange={this.saveChanageData} defaultValue={this.state.dateFormats.length ? this.state.dateFormats[0] : ''}>
+                  {optionsDateFormats}
+                </select>
+              </div>
+            </div>
+          </div>
+          <div className="field has-addons">
+            <div className="control">
+              <input className="input" type="text" placeholder="Select Path" name='directory'></input>
+            </div>
+            <div className="control">
+              <a className="button is-info" onClick={this.openDialog}>Directory</a>
+            </div>
+          </div>
+          <div className='field'>
+            <div className='control'>
+              <button className='button' onClick={this.create}>Create</button>
             </div>
           </div>
         </div>
-        <div className="field has-addons">
-          <div className="control">
-            <input className="input" type="text" placeholder="Select Path" name='directory'></input>
-          </div>
-          <div className="control">
-            <a className="button is-info" onClick={this.openDialog}>Directory</a>
-          </div>
-        </div>
-        <div className='field'>
-          <div className='control'>
-            <button className='button' onClick={this.create}>Create</button>
-          </div>
-        </div>
-      </div>
-    );
+      );
+    }
   }
 }

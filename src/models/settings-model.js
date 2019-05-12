@@ -15,10 +15,12 @@ export default class SettingModel{
     return new Promise((resolve,reject)=>{
       this.db.get('settings').then((settings)=>{
         this.model = Object.assign({},this.model,settings);
+        console.log(this.model);
         resolve();
       }).catch((error)=>{
         this.db.put(this.model).then((settings)=>{
           this.model = Object.assign({},this.model,settings);
+          console.log(this.model);
           resolve();
         }).catch((error)=>{
           reject();
