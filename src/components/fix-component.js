@@ -13,7 +13,7 @@ export default class FixComponent extends React.Component{
       fix: '',
       version: '',
       path: '',
-      dateFormat: 'DD/MM/YYYY',
+      dateFormat: '',
       endLine: 'lf'
     }
     this.state = {showMessage: false, versions:[],dateFormats:[],loaded: false};
@@ -42,7 +42,7 @@ export default class FixComponent extends React.Component{
     this.fixForm[event.target.name] = event.target.value;
   }
   createDate(){
-    let format = this.fixForm.dateFormat ? this.fixForm.dateFormat : this.fixForm.dateFormat;
+    let format = this.fixForm.dateFormat ? this.fixForm.dateFormat : 'DD/MM/YYYY';
     return Moment().format(format);
   }
   getEndLine(){
@@ -69,7 +69,13 @@ export default class FixComponent extends React.Component{
         versions: this.settings.getVersions(),
         dateFormats: this.settings.getDateFormats(),
         loaded: true
-      })
+      });
+      if(this.settings.getVersions().length){
+        this.fixForm.verion = this.settings.getVersions()[0];
+      }
+      if(this.settings.getDateFormats().length){
+        this.fixForm.dateFormat = this.settings.getDateFormats()[0];
+      }
     });
   }
   render(){
