@@ -6,6 +6,7 @@ import FixComponent from './fix-component';
 import DocumentsComponent from './documents-component';
 import DescriptionJiraComponent from './description-jira-component';
 import SettingsComponent from './settings-component';
+import DashBoardComponent from './dashboard-component';
 
 export default class MainComponent extends React.Component{
   constructor(props){
@@ -35,7 +36,7 @@ export default class MainComponent extends React.Component{
           </div>
           <div id="mimimiFixNavbar" className={"navbar-menu" + (this.state.mobileMenu ? ' is-active' : '')}>
             <div className="navbar-start">
-                {/* <Link to='/' className='navbar-item'>Documents</Link> */}
+                <Link to='/' className='navbar-item' onClick={this.closeMobileMenu}>DashBoard</Link>
                 <Link to='/fix' className="navbar-item" onClick={this.closeMobileMenu}>Create Fix</Link>
                 <Link to='/description' className="navbar-item" onClick={this.closeMobileMenu}>Create jira document</Link>
             </div>
@@ -45,7 +46,7 @@ export default class MainComponent extends React.Component{
           </div>
         </nav>
         <div id='main-study' className='container is-fluid'>
-          {/* <Route path='/' exact component={DocumentsComponent}></Route> */}
+          <Route path='/' exact component={DashBoardComponent}></Route>
           <Route path='/fix' exact component={FixComponent}></Route>
           <Route path='/description' exact component={DescriptionJiraComponent}></Route>
           <Route path='/settings' exact component={SettingsComponent}></Route>

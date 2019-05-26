@@ -11,6 +11,7 @@ export default class SettingsComponent extends React.Component{
     this.removeDateFormat = this.removeDateFormat.bind(this);
     this.login = this.login.bind(this);
     this.handleInputLoginForm = this.handleInputLoginForm.bind(this);
+    this.createSocketEvents = this.createSocketEvents.bind(this);
 
     this.state = {
       versions: [],
@@ -30,7 +31,10 @@ export default class SettingsComponent extends React.Component{
       console.log('ESTE ES EL USUARIO');
       console.log(token);
       if(token){
-        localStorage.setItem('token',token);
+        if(typeof token === 'string'){
+          localStorage.setItem('token',token);
+        }
+        this.setState({isLogin: true});
       }
     });
   }
@@ -102,7 +106,10 @@ export default class SettingsComponent extends React.Component{
         versions: this.settings.getVersions(),
         dateFormats: this.settings.getDateFormats()
       });
-    })
+    });
+    // Check if it is logued
+    console.log('COMPROBANDO LOGIN');
+    socket.emit('isLogin',{token: localStorage.getItem('token')});
   }
   componentWillUnmount(){
     // Remove Events
@@ -134,6 +141,7 @@ export default class SettingsComponent extends React.Component{
     return (
       <div>
         <h1 className='title'>SETTINGS</h1>
+        {!this.state.isLogin &&
         <form id='login-form' onSubmit={this.login}>
           <h2 className='title'>Login</h2>
           <div className="field">
@@ -165,7 +173,8 @@ export default class SettingsComponent extends React.Component{
             <button className="button is-primary">Submit</button>
           </div>
         </form>
-
+        }
+        {this.state.isLogin && <h2>You are logued</h2>}
         <label className="label">Create Version</label>
         <div className="field has-addons">
           <div className="control">
